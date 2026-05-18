@@ -54,10 +54,12 @@ export interface Class {
 // Interface Subject
 export interface Subject {
   id: number;
-  subjectCode: string;
-  subjectName: string;
-  credits: number;
+  subjectCode: string; // Mã môn học (Ví dụ: TEST_101)
+  subjectName: string; // Tên môn học
+  credits: number;     // Số tín chỉ
 }
+
+export type SubjectPayload = Omit<Subject, 'id'>;
 
 export interface Score {
   id: number;

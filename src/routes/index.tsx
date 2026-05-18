@@ -6,9 +6,7 @@ import { StudentList } from '../pages/students/StudentList';
 // Import file thực tế vừa tạo
 import { ClassList } from '../pages/classes/ClassList';
 import { ScoreList } from '../pages/scores/ScoreList';
-
-// Mock Pages (Sẽ làm ở các bước sau)
-const SubjectList = () => <div>Trang Quản lý Môn học</div>;
+import { SubjectList } from '../pages/subjects/SubjectList';
 
 export const AppRoutes = () => {
   return (
