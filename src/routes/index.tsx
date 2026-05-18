@@ -5,10 +5,10 @@ import { LoginPage } from '../pages/LoginPage';
 import { StudentList } from '../pages/students/StudentList';
 // Import file thực tế vừa tạo
 import { ClassList } from '../pages/classes/ClassList';
+import { ScoreList } from '../pages/scores/ScoreList';
 
 // Mock Pages (Sẽ làm ở các bước sau)
 const SubjectList = () => <div>Trang Quản lý Môn học</div>;
-const ScoreList = () => <div>Trang Quản lý Điểm số</div>;
 
 export const AppRoutes = () => {
   return (
