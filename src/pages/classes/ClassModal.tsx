@@ -1,5 +1,6 @@
+// src/pages/classes/ClassModal.tsx
 import React, { useEffect } from 'react';
-import { Modal, Form, Input, InputNumber, message } from 'antd';
+import { Modal, Form, Input, message } from 'antd'; // Bỏ InputNumber vì không dùng nữa
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { classApi, ClassPayload } from '../../api/classApi';
 import { Class } from '../../types';
@@ -61,18 +62,31 @@ export const ClassModal: React.FC<ClassModalProps> = ({ open, onClose, editingCl
       destroyOnClose
     >
       <Form form={form} layout="vertical" name="classForm">
+        {/* Trường Mã Lớp học */}
+        <Form.Item 
+          name="classCode" 
+          label="Mã Lớp học" 
+          rules={[{ required: true, message: 'Vui lòng nhập mã lớp học' }]}
+        >
+          <Input placeholder="Nhập mã lớp học (VD: TH01, PM02...)" />
+        </Form.Item>
+
+        {/* Trường Tên Lớp học */}
         <Form.Item 
           name="className" 
           label="Tên Lớp học" 
           rules={[{ required: true, message: 'Vui lòng nhập tên lớp học' }]}
         >
-          <Input placeholder="Nhập tên lớp học (VD: IT1, IT2...)" />
+          <Input placeholder="Nhập tên lớp học" />
         </Form.Item>
+
+        {/* Trường Chuyên ngành */}
         <Form.Item 
-          name="teacherId" 
-          label="ID Giảng viên chủ nhiệm"
+          name="major" 
+          label="Chuyên ngành" 
+          rules={[{ required: true, message: 'Vui lòng nhập chuyên ngành' }]}
         >
-          <InputNumber style={{ width: '100%' }} placeholder="Nhập ID giảng viên" />
+          <Input placeholder="Nhập chuyên ngành (VD: Công nghệ phần mềm...)" />
         </Form.Item>
       </Form>
     </Modal>

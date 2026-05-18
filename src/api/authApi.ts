@@ -9,6 +9,7 @@ export interface LoginPayload {
 
 export const authApi = {
   login: async (payload: LoginPayload): Promise<ApiResponse<AuthResponse>> => {
-    return axiosClient.post('/api/auth/login', payload);
+    // Đổi từ '/api/auth/login' thành '/auth/login'
+    return axiosClient.post('/auth/login', payload); 
   },
 };

@@ -36,16 +36,19 @@ export interface Student {
   id: number;
   studentCode: string;
   fullName: string;
-  email: string;
+  gender: 'MALE' | 'FEMALE'; // Thêm giới tính dạng Enum chuẩn dữ liệu gửi lên
   dateOfBirth: string;
+  email: string;
+  phone: string;             // Thêm số điện thoại
+  address: string;           // Thêm địa chỉ
   classId: number;
 }
 
-// Interface Class
 export interface Class {
   id: number;
-  className: string;
-  teacherId?: number;
+  classCode: string;   // Mã lớp học
+  className: string;   // Tên lớp học
+  major: string;       // Chuyên ngành
 }
 
 // Interface Subject
@@ -56,10 +59,16 @@ export interface Subject {
   credits: number;
 }
 
-// Interface Score
 export interface Score {
   id: number;
   studentId: number;
   subjectId: number;
-  scoreValue: number;
+  midtermScore: number;
+  finalScore: number;
+  // Các thuộc tính bổ sung nếu Backend trả về thông tin hiển thị mở rộng
+  studentCode?: string;
+  fullName?: string;
+  subjectName?: string;
 }
+
+export type ScorePayload = Omit<Score, 'id'>;

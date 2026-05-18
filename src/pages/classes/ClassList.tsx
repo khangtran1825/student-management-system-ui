@@ -43,33 +43,37 @@ export const ClassList: React.FC = () => {
     setIsModalOpen(true);
   };
 
-  const columns = [
-    { title: 'ID', dataIndex: 'id', key: 'id', width: 80 },
-    { title: 'Tên Lớp', dataIndex: 'className', key: 'className' },
-    { title: 'ID Giảng viên', dataIndex: 'teacherId', key: 'teacherId' },
-    {
-      title: 'Hành động',
-      key: 'actions',
-      render: (_: any, record: Class) => (
-        <Space size="middle">
-          <Button 
-            type="text" 
-            icon={<EditOutlined />} 
-            onClick={() => handleEdit(record)} 
-            style={{ color: '#1890ff' }}
-          />
-          <Popconfirm
-            title="Bạn có chắc chắn muốn xóa lớp học này?"
-            onConfirm={() => deleteMutation.mutate(record.id)}
-            okText="Xóa"
-            cancelText="Hủy"
-          >
-            <Button type="text" danger icon={<DeleteOutlined />} loading={deleteMutation.isPending} />
-          </Popconfirm>
-        </Space>
-      ),
-    },
-  ];
+  // src/pages/classes/ClassList.tsx
+
+// Tìm đến mảng columns bên trong component ClassList và sửa lại như sau:
+const columns = [
+  { title: 'ID', dataIndex: 'id', key: 'id', width: 80 },
+  { title: 'Mã Lớp', dataIndex: 'classCode', key: 'classCode' },
+  { title: 'Tên Lớp', dataIndex: 'className', key: 'className' },
+  { title: 'Chuyên ngành', dataIndex: 'major', key: 'major' },
+  {
+    title: 'Hành động',
+    key: 'actions',
+    render: (_: any, record: Class) => (
+      <Space size="middle">
+        <Button 
+          type="text" 
+          icon={<EditOutlined />} 
+          onClick={() => handleEdit(record)} 
+          style={{ color: '#1890ff' }}
+        />
+        <Popconfirm
+          title="Bạn có chắc chắn muốn xóa lớp học này?"
+          onConfirm={() => deleteMutation.mutate(record.id)}
+          okText="Xóa"
+          cancelText="Hủy"
+        >
+          <Button type="text" danger icon={<DeleteOutlined />} loading={deleteMutation.isPending} />
+        </Popconfirm>
+      </Space>
+    ),
+  },
+];
 
   return (
     <Card title="Danh sách Lớp học">

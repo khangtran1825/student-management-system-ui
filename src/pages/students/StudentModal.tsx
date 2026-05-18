@@ -1,5 +1,6 @@
+// src/pages/students/StudentModal.tsx
 import React, { useEffect } from 'react';
-import { Modal, Form, Input, DatePicker, message, InputNumber } from 'antd';
+import { Modal, Form, Input, DatePicker, message, InputNumber, Select } from 'antd'; // Import thêm Select từ antd
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import dayjs from 'dayjs';
 import { studentApi, StudentPayload } from '../../api/studentApi';
@@ -16,7 +17,6 @@ export const StudentModal: React.FC<StudentModalProps> = ({ open, onClose, editi
   const queryClient = useQueryClient();
   const isEdit = !!editingStudent;
 
-  // Cập nhật giá trị form khi mở modal sửa hoặc thêm mới
   useEffect(() => {
     if (open && editingStudent) {
       form.setFieldsValue({
@@ -38,7 +38,6 @@ export const StudentModal: React.FC<StudentModalProps> = ({ open, onClose, editi
     onSuccess: (response) => {
       if (response.success) {
         message.success(isEdit ? 'Cập nhật thành công!' : 'Thêm mới thành công!');
-        // Yêu cầu React Query fetch lại danh sách sinh viên
         queryClient.invalidateQueries({ queryKey: ['students'] });
         onClose();
       } else {
@@ -53,7 +52,6 @@ export const StudentModal: React.FC<StudentModalProps> = ({ open, onClose, editi
   const handleSubmit = async () => {
     try {
       const values = await form.validateFields();
-      // Format lại ngày tháng trước khi gửi lên backend
       const payload: StudentPayload = {
         ...values,
         dateOfBirth: values.dateOfBirth ? values.dateOfBirth.format('YYYY-MM-DD') : null,
@@ -74,19 +72,41 @@ export const StudentModal: React.FC<StudentModalProps> = ({ open, onClose, editi
       destroyOnClose
     >
       <Form form={form} layout="vertical" name="studentForm">
-        <Form.Item name="studentCode" label="Mã sinh viên" rules={[{ required: true }]}>
+        <Form.Item name="studentCode" label="Mã sinh viên" rules={[{ required: true, message: 'Vui lòng nhập mã sinh viên!' }]}>
           <Input placeholder="Nhập mã sinh viên" />
         </Form.Item>
-        <Form.Item name="fullName" label="Họ và tên" rules={[{ required: true }]}>
+
+        <Form.Item name="fullName" label="Họ và tên" rules={[{ required: true, message: 'Vui lòng nhập họ và tên!' }]}>
           <Input placeholder="Nhập họ và tên" />
         </Form.Item>
-        <Form.Item name="email" label="Email" rules={[{ required: true, type: 'email' }]}>
-          <Input placeholder="Nhập email" />
+
+        {/* Thêm trường Giới tính */}
+        <Form.Item name="gender" label="Giới tính" rules={[{ required: true, message: 'Vui lòng chọn giới tính!' }]}>
+          <Select placeholder="Chọn giới tính">
+            <Select.Option value="MALE">Nam</Select.Option>
+            <Select.Option value="FEMALE">Nữ</Select.Option>
+          </Select>
         </Form.Item>
-        <Form.Item name="dateOfBirth" label="Ngày sinh" rules={[{ required: true }]}>
+
+        <Form.Item name="dateOfBirth" label="Ngày sinh" rules={[{ required: true, message: 'Vui lòng chọn ngày sinh!' }]}>
           <DatePicker style={{ width: '100%' }} format="YYYY-MM-DD" />
         </Form.Item>
-        <Form.Item name="classId" label="ID Lớp học" rules={[{ required: true }]}>
+
+        <Form.Item name="email" label="Email" rules={[{ required: true, type: 'email', message: 'Vui lòng nhập email hợp lệ!' }]}>
+          <Input placeholder="Nhập email" />
+        </Form.Item>
+
+        {/* Thêm trường Số điện thoại */}
+        <Form.Item name="phone" label="Số điện thoại" rules={[{ required: true, message: 'Vui lòng nhập số điện thoại!' }]}>
+          <Input placeholder="Nhập số điện thoại" />
+        </Form.Item>
+
+        {/* Thêm trường Địa chỉ */}
+        <Form.Item name="address" label="Địa chỉ" rules={[{ required: true, message: 'Vui lòng nhập địa chỉ!' }]}>
+          <Input placeholder="Nhập địa chỉ" />
+        </Form.Item>
+
+        <Form.Item name="classId" label="ID Lớp học" rules={[{ required: true, message: 'Vui lòng nhập ID lớp học!' }]}>
           <InputNumber style={{ width: '100%' }} placeholder="Nhập ID lớp học" />
         </Form.Item>
       </Form>

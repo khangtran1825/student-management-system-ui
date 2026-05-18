@@ -56,35 +56,46 @@ export const StudentList: React.FC = () => {
     setIsModalOpen(true);
   };
 
-  const columns = [
-    { title: 'Mã SV', dataIndex: 'studentCode', key: 'studentCode' },
-    { title: 'Họ và tên', dataIndex: 'fullName', key: 'fullName' },
-    { title: 'Email', dataIndex: 'email', key: 'email' },
-    { title: 'Ngày sinh', dataIndex: 'dateOfBirth', key: 'dateOfBirth' },
-    { title: 'Class ID', dataIndex: 'classId', key: 'classId' },
-    {
-      title: 'Hành động',
-      key: 'actions',
-      render: (_: any, record: Student) => (
-        <Space size="middle">
-          <Button 
-            type="text" 
-            icon={<EditOutlined />} 
-            onClick={() => handleEdit(record)} 
-            style={{ color: '#1890ff' }}
-          />
-          <Popconfirm
-            title="Bạn có chắc chắn muốn xóa sinh viên này?"
-            onConfirm={() => deleteMutation.mutate(record.id)}
-            okText="Xóa"
-            cancelText="Hủy"
-          >
-            <Button type="text" danger icon={<DeleteOutlined />} loading={deleteMutation.isPending} />
-          </Popconfirm>
-        </Space>
-      ),
-    },
-  ];
+  // src/pages/students/StudentList.tsx
+
+// Tìm đến mảng columns bên trong component StudentList và sửa lại như sau:
+const columns = [
+  { title: 'Mã SV', dataIndex: 'studentCode', key: 'studentCode' },
+  { title: 'Họ và tên', dataIndex: 'fullName', key: 'fullName' },
+  { 
+    title: 'Giới tính', 
+    dataIndex: 'gender', 
+    key: 'gender',
+    render: (gender: string) => gender === 'MALE' ? 'Nam' : 'Nữ' // Chuyển đổi hiển thị tiếng Việt
+  },
+  { title: 'Ngày sinh', dataIndex: 'dateOfBirth', key: 'dateOfBirth' },
+  { title: 'Email', dataIndex: 'email', key: 'email' },
+  { title: 'Số điện thoại', dataIndex: 'phone', key: 'phone' },   // Thêm cột SĐT
+  { title: 'Địa chỉ', dataIndex: 'address', key: 'address' },       // Thêm cột Địa chỉ
+  { title: 'Class ID', dataIndex: 'classId', key: 'classId' },
+  {
+    title: 'Hành động',
+    key: 'actions',
+    render: (_: any, record: Student) => (
+      <Space size="middle">
+        <Button 
+          type="text" 
+          icon={<EditOutlined />} 
+          onClick={() => handleEdit(record)} 
+          style={{ color: '#1890ff' }}
+        />
+        <Popconfirm
+          title="Bạn có chắc chắn muốn xóa sinh viên này?"
+          onConfirm={() => deleteMutation.mutate(record.id)}
+          okText="Xóa"
+          cancelText="Hủy"
+        >
+          <Button type="text" danger icon={<DeleteOutlined />} loading={deleteMutation.isPending} />
+        </Popconfirm>
+      </Space>
+    ),
+  },
+];
 
   return (
     <Card title="Danh sách Sinh viên">

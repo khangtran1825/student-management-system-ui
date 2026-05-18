@@ -11,10 +11,7 @@ export const LoginPage: React.FC = () => {
   const setAuth = useAuthStore((state) => state.setAuth);
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
 
-  // Nếu đã đăng nhập thì tự động chuyển hướng vào Dashboard
-  if (isAuthenticated) {
-    return <Navigate to="/" replace />;
-  }
+  
 
   // Khởi tạo mutation với TanStack Query
   const loginMutation = useMutation({
@@ -36,6 +33,10 @@ export const LoginPage: React.FC = () => {
       message.error(errorMsg);
     },
   });
+  // Nếu đã đăng nhập thì tự động chuyển hướng vào Dashboard
+  if (isAuthenticated) {
+    return <Navigate to="/" replace />;
+  }
 
   const onFinish = (values: LoginPayload) => {
     loginMutation.mutate(values);

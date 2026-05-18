@@ -2,7 +2,7 @@ import axios, { AxiosError, InternalAxiosRequestConfig, AxiosResponse } from 'ax
 import { useAuthStore } from '../store/authStore';
 
 const axiosClient = axios.create({
-  baseURL: 'localhost:8080/api',
+  baseURL: '/api', // Đổi thành đường dẫn tương đối để kích hoạt Proxy của Vite
   headers: {
     'Content-Type': 'application/json',
   },
