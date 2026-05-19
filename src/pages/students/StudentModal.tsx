@@ -1,9 +1,10 @@
 // src/pages/students/StudentModal.tsx
 import React, { useEffect } from 'react';
-import { Modal, Form, Input, DatePicker, message, InputNumber, Select } from 'antd'; // Import thêm Select từ antd
-import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { Modal, Form, Input, DatePicker, message, Select } from 'antd';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import dayjs from 'dayjs';
 import { studentApi, StudentPayload } from '../../api/studentApi';
+import { classApi } from '../../api/classApi';
 import { Student } from '../../types';
 
 interface StudentModalProps {
@@ -16,6 +17,12 @@ export const StudentModal: React.FC<StudentModalProps> = ({ open, onClose, editi
   const [form] = Form.useForm();
   const queryClient = useQueryClient();
   const isEdit = !!editingStudent;
+
+  const { data: classResponse, isLoading: classLoading } = useQuery({
+    queryKey: ['classes', 'all'],
+    queryFn: () => classApi.getAllClasses(),
+    enabled: open,
+  });
 
   useEffect(() => {
     if (open && editingStudent) {
@@ -106,8 +113,15 @@ export const StudentModal: React.FC<StudentModalProps> = ({ open, onClose, editi
           <Input placeholder="Nhập địa chỉ" />
         </Form.Item>
 
-        <Form.Item name="classId" label="ID Lớp học" rules={[{ required: true, message: 'Vui lòng nhập ID lớp học!' }]}>
-          <InputNumber style={{ width: '100%' }} placeholder="Nhập ID lớp học" />
+        <Form.Item name="classId" label="Lớp học" rules={[{ required: true, message: 'Vui lòng chọn lớp học!' }]}>
+          <Select
+            placeholder="Chọn lớp học"
+            loading={classLoading}
+            options={(classResponse?.data || []).map((item) => ({
+              value: item.id,
+              label: `${item.classCode} - ${item.className}`,
+            }))}
+          />
         </Form.Item>
       </Form>
     </Modal>

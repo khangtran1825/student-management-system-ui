@@ -72,7 +72,7 @@ const columns = [
   { title: 'Email', dataIndex: 'email', key: 'email' },
   { title: 'Số điện thoại', dataIndex: 'phone', key: 'phone' },   // Thêm cột SĐT
   { title: 'Địa chỉ', dataIndex: 'address', key: 'address' },       // Thêm cột Địa chỉ
-  { title: 'Class ID', dataIndex: 'classId', key: 'classId' },
+  { title: 'Lớp học', key: 'className', render: (_: any, record: Student) => record.className || record.classCode || record.classId },
   {
     title: 'Hành động',
     key: 'actions',

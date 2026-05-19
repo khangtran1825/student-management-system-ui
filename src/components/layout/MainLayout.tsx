@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Layout, Menu, Button, theme } from 'antd';
 import {
+  DashboardOutlined,
   UserOutlined,
   TeamOutlined,
   BookOutlined,
@@ -30,6 +31,7 @@ export const MainLayout: React.FC = () => {
   };
 
   const menuItems = [
+    { key: '/dashboard', icon: <DashboardOutlined />, label: 'Tổng quan' },
     { key: '/students', icon: <UserOutlined />, label: 'Quản lý Sinh viên' },
     { key: '/classes', icon: <TeamOutlined />, label: 'Lớp học' },
     { key: '/subjects', icon: <BookOutlined />, label: 'Môn học' },
@@ -62,7 +64,7 @@ export const MainLayout: React.FC = () => {
           onClick={({ key }) => navigate(key)}
         />
       </Sider>
-      <Layout>
+      <Layout style={{ height: '100vh', display: 'flex', flexDirection: 'column' }}>
         <Header 
           style={{ 
             padding: '0 24px', 
@@ -85,7 +87,7 @@ export const MainLayout: React.FC = () => {
             Đăng xuất
           </Button>
         </Header>
-        <Content style={{ margin: '24px 16px', padding: 24, background: colorBgContainer, borderRadius: borderRadiusLG }}>
+        <Content style={{ margin: 0, padding: 24, background: colorBgContainer, borderRadius: 0, flex: 1, overflow: 'auto' }}>
           {/* Nơi render các Component con (các trang quản lý) */}
           <Outlet />
         </Content>

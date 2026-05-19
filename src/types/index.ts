@@ -42,6 +42,8 @@ export interface Student {
   phone: string;             // Thêm số điện thoại
   address: string;           // Thêm địa chỉ
   classId: number;
+  classCode?: string;
+  className?: string;
 }
 
 export interface Class {
@@ -74,3 +76,15 @@ export interface Score {
 }
 
 export type ScorePayload = Omit<Score, 'id'>;
+
+export interface DashboardSummary {
+  totalStudents: number;
+  totalClasses: number;
+  totalSubjects: number;
+  totalScores: number;
+  totalUsers: number;
+  activeUsers: number;
+  totalTeachers: number;
+  totalAdmins: number;
+  generatedAt: string;
+}

@@ -2,6 +2,7 @@ import { Routes, Route, Navigate } from 'react-router-dom';
 import { ProtectedRoute } from '../components/ProtectedRoute';
 import { MainLayout } from '../components/layout/MainLayout';
 import { LoginPage } from '../pages/LoginPage';
+import { DashboardPage } from '../pages/DashboardPage';
 import { StudentList } from '../pages/students/StudentList';
 // Import file thực tế vừa tạo
 import { ClassList } from '../pages/classes/ClassList';
@@ -15,7 +16,8 @@ export const AppRoutes = () => {
 
       <Route element={<ProtectedRoute />}>
         <Route element={<MainLayout />}>
-          <Route path="/" element={<Navigate to="/students" replace />} />
+          <Route path="/" element={<Navigate to="/dashboard" replace />} />
+          <Route path="/dashboard" element={<DashboardPage />} />
           <Route path="/students" element={<StudentList />} />
           <Route path="/classes" element={<ClassList />} />
           <Route path="/subjects" element={<SubjectList />} />

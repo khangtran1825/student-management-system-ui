@@ -1,8 +1,9 @@
 // src/pages/scores/ScoreModal.tsx
 import React, { useEffect } from 'react';
-import { Modal, Form, InputNumber, message } from 'antd';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { Modal, Form, InputNumber, message, Select } from 'antd';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { scoreApi } from '../../api/scoreApi';
+import { subjectApi } from '../../api/subjectApi';
 import { Score, ScorePayload } from '../../types';
 
 interface ScoreModalProps {
@@ -16,6 +17,12 @@ export const ScoreModal: React.FC<ScoreModalProps> = ({ open, onClose, editingSc
   const [form] = Form.useForm();
   const queryClient = useQueryClient();
   const isEdit = !!editingScore;
+
+  const { data: subjectResponse, isLoading: subjectLoading } = useQuery({
+    queryKey: ['subjects', 'all'],
+    queryFn: () => subjectApi.getAllSubjects(),
+    enabled: open,
+  });
 
   useEffect(() => {
     if (open) {
@@ -78,10 +85,17 @@ export const ScoreModal: React.FC<ScoreModalProps> = ({ open, onClose, editingSc
 
         <Form.Item 
           name="subjectId" 
-          label="ID Môn học" 
-          rules={[{ required: true, message: 'Vui lòng nhập ID môn học!' }]}
+          label="Môn học" 
+          rules={[{ required: true, message: 'Vui lòng chọn môn học!' }]}
         >
-          <InputNumber style={{ width: '100%' }} placeholder="Nhập ID môn học (Ví dụ: 4)" />
+          <Select
+            placeholder="Chọn môn học"
+            loading={subjectLoading}
+            options={(subjectResponse?.data || []).map((item) => ({
+              value: item.id,
+              label: `${item.subjectCode} - ${item.subjectName}`,
+            }))}
+          />
         </Form.Item>
 
         <Form.Item 
