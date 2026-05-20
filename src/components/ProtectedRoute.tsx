@@ -1,13 +1,13 @@
 import { Navigate, Outlet } from 'react-router-dom';
-import { useAuthStore } from '../store/authStore';
+import { useSelector } from 'react-redux';
+import { RootState } from '../store';
 
 export const ProtectedRoute = () => {
-  const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
+  const isAuthenticated = useSelector((state: RootState) => state.auth.isAuthenticated);
 
   if (!isAuthenticated) {
     return <Navigate to="/login" replace />;
   }
 
-  // Nếu đã đăng nhập, render các route con bên trong
   return <Outlet />;
 };
