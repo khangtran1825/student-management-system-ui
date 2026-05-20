@@ -1,89 +1,100 @@
-import React from 'react';
-import { Form, Input, Button, Card, message } from 'antd';
-import { UserOutlined, LockOutlined } from '@ant-design/icons';
-import { useMutation } from '@tanstack/react-query';
-import { useNavigate, Navigate } from 'react-router-dom';
-import { authApi, LoginPayload } from '../api/authApi';
-import { useAuthStore } from '../store/authStore';
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { toast } from 'sonner';
+import { useDispatch } from 'react-redux';
+import { setCredentials } from '../store/authSlice';
+import { useLoginMutation } from '../store/api/authApi';
+import { Button } from '../components/ui/button';
+import { Input } from '../components/ui/input';
+import { Label } from '../components/ui/label';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card';
+import { GraduationCap } from 'lucide-react';
 
-export const LoginPage: React.FC = () => {
+export const LoginPage = () => {
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
   const navigate = useNavigate();
-  const setAuth = useAuthStore((state) => state.setAuth);
-  const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
+  const dispatch = useDispatch();
+  const [login, { isLoading }] = useLoginMutation();
 
-  
-
-  // Khởi tạo mutation với TanStack Query
-  const loginMutation = useMutation({
-    mutationFn: (values: LoginPayload) => authApi.login(values),
-    onSuccess: (response) => {
-      if (response.success && response.data) {
-        // Lưu token và thông tin user vào Zustand
-        setAuth(response.data.token, response.data.user);
-        message.success('Đăng nhập thành công!');
-        // Chuyển hướng vào trang quản trị
-        navigate('/');
+  const handleLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError('');
+    const tid = toast.loading('Đang đăng nhập...');
+    try {
+      const res = await login({ username, password }).unwrap();
+      if (res.success && res.data) {
+        dispatch(setCredentials({ 
+          user: { username: res.data.username, role: res.data.role, studentId: res.data.studentId ?? null }, 
+          token: res.data.token 
+        }));
+        toast.success(`Chào mừng, ${res.data.username}! (Đang đăng nhập với quyền ${res.data.role})`, { id: tid });
+        navigate('/dashboard');
       } else {
-        message.error(response.message || 'Đăng nhập thất bại!');
+        const msg = res.message || 'Đăng nhập thất bại';
+        setError(msg);
+        toast.error(msg, { id: tid });
       }
-    },
-    onError: (error: any) => {
-      // Xử lý lỗi từ server trả về (ví dụ: sai user/pass)
-      const errorMsg = error.response?.data?.message || 'Có lỗi xảy ra khi đăng nhập.';
-      message.error(errorMsg);
-    },
-  });
-  // Nếu đã đăng nhập thì tự động chuyển hướng vào Dashboard
-  if (isAuthenticated) {
-    return <Navigate to="/" replace />;
-  }
-
-  const onFinish = (values: LoginPayload) => {
-    loginMutation.mutate(values);
+    } catch (err: any) {
+      const msg = err?.data?.message || 'Lỗi kết nối đến server';
+      setError(msg);
+      toast.error(msg, { id: tid });
+    }
   };
 
   return (
-    <div 
-      style={{ 
-        display: 'flex', 
-        justifyContent: 'center', 
-        alignItems: 'center', 
-        height: '100vh', 
-        background: '#f0f2f5' 
-      }}
-    >
-      <Card title="Hệ thống Quản lý Sinh viên" style={{ width: 400, boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}>
-        <Form
-          name="login_form"
-          onFinish={onFinish}
-          layout="vertical"
-          size="large"
-        >
-          <Form.Item
-            name="username"
-            rules={[{ required: true, message: 'Vui lòng nhập tên đăng nhập!' }]}
-          >
-            <Input prefix={<UserOutlined />} placeholder="Tên đăng nhập" />
-          </Form.Item>
-
-          <Form.Item
-            name="password"
-            rules={[{ required: true, message: 'Vui lòng nhập mật khẩu!' }]}
-          >
-            <Input.Password prefix={<LockOutlined />} placeholder="Mật khẩu" />
-          </Form.Item>
-
-          <Form.Item>
+    <div className="min-h-screen flex items-center justify-center bg-slate-50 p-4">
+      <Card className="w-full max-w-sm shadow-lg border-slate-200">
+        <CardHeader className="space-y-2 text-center pb-6">
+          <div className="flex justify-center mb-2">
+            <div className="bg-blue-600 p-3 rounded-full">
+              <GraduationCap className="w-6 h-6 text-white" />
+            </div>
+          </div>
+          <CardTitle className="text-2xl font-bold">Hệ thống Quản lý</CardTitle>
+          <CardDescription>Đăng nhập để tiếp tục</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <form onSubmit={handleLogin} className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="username">Tên đăng nhập</Label>
+              <Input 
+                id="username" 
+                type="text" 
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                required
+                className="focus-visible:ring-blue-600"
+              />
+            </div>
+            <div className="space-y-2">
+              <div className="flex items-center justify-between">
+                <Label htmlFor="password">Mật khẩu</Label>
+              </div>
+              <Input 
+                id="password" 
+                type="password" 
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+                className="focus-visible:ring-blue-600"
+              />
+            </div>
+            {error && (
+              <div className="text-sm font-medium text-destructive">
+                {error}
+              </div>
+            )}
             <Button 
-              type="primary" 
-              htmlType="submit" 
-              style={{ width: '100%' }} 
-              loading={loginMutation.isPending}
+              type="submit" 
+              className="w-full bg-blue-600 hover:bg-blue-700"
+              disabled={isLoading}
             >
-              Đăng nhập
+              {isLoading ? 'Đang đăng nhập...' : 'Đăng nhập'}
             </Button>
-          </Form.Item>
-        </Form>
+          </form>
+        </CardContent>
       </Card>
     </div>
   );
