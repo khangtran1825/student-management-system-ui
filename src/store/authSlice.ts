@@ -4,6 +4,7 @@ interface User {
   username: string;
   role: string;
   studentId?: number | null;
+  mustChangePassword?: boolean;
 }
 
 interface AuthState {
@@ -13,17 +14,36 @@ interface AuthState {
 }
 
 const rawUser = localStorage.getItem('user');
-let parsedUser = null;
+let parsedUser: User | null = null;
+
+function isTokenExpired(token: string | null): boolean {
+  if (!token) return true;
+  try {
+    const parts = token.split('.');
+    if (parts.length !== 3) return true;
+    const payload = JSON.parse(atob(parts[1].replace(/-/g, '+').replace(/_/g, '/')));
+    if (!payload.exp) return true;
+    // exp is in seconds since epoch
+    return Date.now() / 1000 >= payload.exp;
+  } catch (e) {
+    return true;
+  }
+}
+
 try {
-  if (rawUser) {
+  const token = localStorage.getItem('token');
+  if (rawUser && token && !isTokenExpired(token)) {
     const parsed = JSON.parse(rawUser);
-    // Ensure the object has required fields, otherwise discard it
     if (parsed && typeof parsed === 'object' && parsed.username && parsed.role) {
       parsedUser = parsed;
     } else {
       localStorage.removeItem('user');
       localStorage.removeItem('token');
     }
+  } else {
+    // remove stale/expired data
+    localStorage.removeItem('user');
+    localStorage.removeItem('token');
   }
 } catch (e) {
   localStorage.removeItem('user');

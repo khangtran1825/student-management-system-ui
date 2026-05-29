@@ -2,9 +2,21 @@ import { apiSlice } from './apiSlice';
 
 export const authApi = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
+    me: builder.query({
+      query: () => '/auth/me',
+      providesTags: ['User'],
+    }),
     login: builder.mutation({
       query: (credentials) => ({
         url: '/auth/login',
+        method: 'POST',
+        body: credentials,
+      }),
+    }),
+    // Student đăng nhập qua endpoint riêng để hỗ trợ mã sinh viên/username
+    studentLogin: builder.mutation({
+      query: (credentials) => ({
+        url: '/auth/student-login',
         method: 'POST',
         body: credentials,
       }),
@@ -16,7 +28,14 @@ export const authApi = apiSlice.injectEndpoints({
         body: data,
       }),
     }),
+    changePassword: builder.mutation({
+      query: (data) => ({
+        url: '/auth/change-password',
+        method: 'POST',
+        body: data,
+      }),
+    }),
   }),
 });
 
-export const { useLoginMutation, useRegisterMutation } = authApi;
+export const { useMeQuery, useLazyMeQuery, useLoginMutation, useStudentLoginMutation, useRegisterMutation, useChangePasswordMutation } = authApi;

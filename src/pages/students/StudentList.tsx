@@ -140,7 +140,7 @@ export const StudentList = () => {
             </div>
             <div className="space-y-1"><Label>Email</Label><Input type="email" value={formData.email} onChange={e => setFormData({ ...formData, email: e.target.value })} required /></div>
             <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-1"><Label>Số điện thoại</Label><Input value={formData.phone} onChange={e => setFormData({ ...formData, phone: e.target.value })} placeholder="Tùy chọn" /></div>
+              <div className="space-y-1"><Label>Số điện thoại</Label><Input value={formData.phone} onChange={e => setFormData({ ...formData, phone: e.target.value })} placeholder="Bắt buộc" required /></div>
               <div className="space-y-1"><Label>Lớp học</Label>
                 <select className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm" value={formData.classId} onChange={e => setFormData({ ...formData, classId: e.target.value })} required>
                   <option value="">-- Chọn lớp --</option>

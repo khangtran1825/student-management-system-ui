@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { toast } from 'sonner';
-import { useGetExamsQuery, useCreateExamMutation, useDeleteExamMutation, useGetSubjectsQuery, useGetSemestersQuery } from '../../store/api/academicApi';
+import { useGetExamsQuery, useGetMyExamsQuery, useCreateExamMutation, useDeleteExamMutation, useGetSubjectsQuery, useGetSemestersQuery } from '../../store/api/academicApi';
 import { useSelector } from 'react-redux';
 import { RootState } from '../../store';
 import { Button } from '../../components/ui/button';
@@ -14,8 +14,11 @@ import { Label } from '../../components/ui/label';
 export const ExamList = () => {
   const { user } = useSelector((state: RootState) => state.auth);
   const isAdmin = user?.role === 'ADMIN';
+  const isTeacher = user?.role === 'TEACHER';
+  const isStudent = user?.role === 'STUDENT';
 
-  const { data: response, isLoading } = useGetExamsQuery(undefined);
+  const { data: response, isLoading } = useGetExamsQuery(undefined, { skip: isTeacher || isStudent });
+  const { data: myExamsRes, isLoading: isMyExamsLoading } = useGetMyExamsQuery(undefined, { skip: isAdmin });
   const { data: subjectsRes } = useGetSubjectsQuery(undefined, { skip: !isAdmin });
   const { data: semestersRes } = useGetSemestersQuery(undefined, { skip: !isAdmin });
   const [createExam, { isLoading: isCreating }] = useCreateExamMutation();
@@ -38,14 +41,16 @@ export const ExamList = () => {
     }
   };
 
-  const exams = response?.data || [];
+  const exams = (isTeacher || isStudent) ? (myExamsRes?.data || []) : (response?.data || []);
   const subjects = subjectsRes?.data || [];
   const semesters = semestersRes?.data || [];
 
   return (
     <div className="space-y-5">
       <div className="flex justify-between items-center">
-        <h1 className="text-2xl font-bold tracking-tight text-slate-900">Lịch thi</h1>
+        <h1 className="text-2xl font-bold tracking-tight text-slate-900">
+          {isStudent ? 'Lịch thi của tôi' : isTeacher ? 'Lịch thi các lớp phụ trách' : 'Lịch thi'}
+        </h1>
         {isAdmin && <Button onClick={() => { setFormData({ subjectId: '', semesterId: '', examDate: '', room: '' }); setFormError(''); setIsOpen(true); }} className="bg-blue-600 hover:bg-blue-700"><Plus className="w-4 h-4 mr-2" />Thêm lịch thi</Button>}
       </div>
       <Card><CardContent className="p-0">
@@ -53,17 +58,19 @@ export const ExamList = () => {
           <TableHeader><TableRow>
             <TableHead>Môn thi</TableHead><TableHead>Học kỳ</TableHead><TableHead>Ngày thi</TableHead>
             <TableHead>Phòng</TableHead>
+            {isTeacher && <TableHead>Lớp đang phụ trách</TableHead>}
             {isAdmin && <TableHead className="text-right w-16">Xóa</TableHead>}
           </TableRow></TableHeader>
           <TableBody>
-            {isLoading ? <TableRow><TableCell colSpan={5} className="text-center py-10">Đang tải...</TableCell></TableRow>
-              : exams.length === 0 ? <TableRow><TableCell colSpan={5} className="text-center py-10 text-slate-400">Không có dữ liệu</TableCell></TableRow>
+            {isLoading || isMyExamsLoading ? <TableRow><TableCell colSpan={isTeacher ? 5 : 4} className="text-center py-10">Đang tải...</TableCell></TableRow>
+              : exams.length === 0 ? <TableRow><TableCell colSpan={isTeacher ? 5 : 4} className="text-center py-10 text-slate-400">Không có dữ liệu</TableCell></TableRow>
               : exams.map((item: any) => (
                 <TableRow key={item.id}>
                   <TableCell>{item.subject?.subjectName}</TableCell>
                   <TableCell>{item.semester?.name}</TableCell>
                   <TableCell>{item.examDate}</TableCell>
                   <TableCell>{item.room}</TableCell>
+                  {isTeacher && <TableCell>{item.classNames?.length ? item.classNames.join(', ') : '-'}</TableCell>}
                   {isAdmin && <TableCell className="text-right"><Button variant="ghost" size="icon" onClick={() => { toast.promise(deleteExam(item.id).unwrap(), { loading: 'Đang xóa...', success: 'Xóa lịch thi thành công!', error: (e) => e?.data?.message || 'Xóa thất bại' }); }} className="text-red-600 hover:bg-red-50"><Trash2 className="w-4 h-4" /></Button></TableCell>}
                 </TableRow>
               ))}

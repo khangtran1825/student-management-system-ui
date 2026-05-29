@@ -3,10 +3,14 @@ import { useSelector } from 'react-redux';
 import { RootState } from '../store';
 
 export const ProtectedRoute = () => {
-  const isAuthenticated = useSelector((state: RootState) => state.auth.isAuthenticated);
+  const auth = useSelector((state: RootState) => state.auth);
 
-  if (!isAuthenticated) {
+  if (!auth.isAuthenticated) {
     return <Navigate to="/login" replace />;
+  }
+
+  if (auth.user?.mustChangePassword) {
+    return <Navigate to="/force-change-password" replace />;
   }
 
   return <Outlet />;

@@ -1,17 +1,15 @@
 import { useSelector } from 'react-redux';
 import { RootState } from '../store';
-import { useGetStudentByIdQuery } from '../store/api/studentApi';
+import { useGetMyStudentQuery } from '../store/api/studentApi';
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
 
 export const StudentProfile = () => {
   const { user } = useSelector((state: RootState) => state.auth);
-  const studentId = user?.studentId;
-
-  const { data: response, isLoading } = useGetStudentByIdQuery(studentId ?? 0, { skip: !studentId });
+  const { data: response, isLoading } = useGetMyStudentQuery(undefined, { skip: user?.role !== 'STUDENT' });
   const student = response?.data;
 
-  if (!studentId) {
-    return <div className="p-6 text-center text-slate-500">Không có thông tin sinh viên liên kết với tài khoản.</div>;
+  if (user?.role !== 'STUDENT') {
+    return <div className="p-6 text-center text-slate-500">Trang này chỉ dành cho sinh viên.</div>;
   }
 
   return (

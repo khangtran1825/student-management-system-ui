@@ -23,7 +23,7 @@ export const apiSlice = createApi({
   baseQuery,
   tagTypes: [
     'AcademicYear', 'Semester', 'Class', 'Subject', 'Student', 
-    'Score', 'Schedule', 'Exam', 'Attendance', 'Report', 'User'
+    'Score', 'Schedule', 'Exam', 'Attendance', 'Report', 'User', 'Teacher'
   ],
   endpoints: () => ({}),
 });

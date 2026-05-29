@@ -23,6 +23,7 @@ export interface User {
   id: number;
   username: string;
   role: Role;
+  mustChangePassword?: boolean;
 }
 
 // Interface Login Response

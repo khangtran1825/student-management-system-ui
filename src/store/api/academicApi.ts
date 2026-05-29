@@ -65,6 +65,7 @@ export const academicApi = apiSlice.injectEndpoints({
 
     // ───── SCHEDULES: /api/schedules ─────
     getSchedules: builder.query({ query: () => '/schedules', providesTags: ['Schedule'] }),
+    getMySchedule: builder.query({ query: () => '/schedules/me', providesTags: ['Schedule'] }),
     createSchedule: builder.mutation({
       query: (data) => ({ url: '/schedules', method: 'POST', body: data }),
       invalidatesTags: ['Schedule'],
@@ -80,6 +81,7 @@ export const academicApi = apiSlice.injectEndpoints({
 
     // ───── EXAMS: /api/exams ─────
     getExams: builder.query({ query: () => '/exams', providesTags: ['Exam'] }),
+    getMyExams: builder.query({ query: () => '/exams/me', providesTags: ['Exam'] }),
     createExam: builder.mutation({
       query: (data) => ({ url: '/exams', method: 'POST', body: data }),
       invalidatesTags: ['Exam'],
@@ -95,6 +97,11 @@ export const academicApi = apiSlice.injectEndpoints({
 
     // ───── ATTENDANCES: /api/attendances ─────
     getAttendances: builder.query({ query: (params?: { studentId?: number; scheduleId?: number }) => ({ url: '/attendances', params }), providesTags: ['Attendance'] }),
+    getClassAttendance: builder.query({ 
+      query: (params: { classId: number; scheduleId: number; date: string }) => 
+        `/attendances/class/${params.classId}/schedule/${params.scheduleId}/date/${params.date}`, 
+      providesTags: ['Attendance'] 
+    }),
     createAttendance: builder.mutation({
       query: (data) => ({ url: '/attendances', method: 'POST', body: data }),
       invalidatesTags: ['Attendance'],
@@ -116,6 +123,20 @@ export const academicApi = apiSlice.injectEndpoints({
       }),
       providesTags: ['Score'],
     }),
+    getMyScores: builder.query({
+      query: () => '/scores/me',
+      providesTags: ['Score'],
+    }),
+    getClassScores: builder.query({
+      query: (params: { subjectId: number; semesterId: number }) => 
+        `/scores/class/subject/${params.subjectId}/semester/${params.semesterId}`,
+      providesTags: ['Score'],
+    }),
+    getClassScoresForTeacher: builder.query({
+      query: (params: { classId: number; subjectId: number; semesterId: number }) => 
+        `/scores/teacher/class/${params.classId}/subject/${params.subjectId}/semester/${params.semesterId}`,
+      providesTags: ['Score'],
+    }),
     getScoresByStudent: builder.query({ query: (studentId: number) => `/scores/student/${studentId}`, providesTags: ['Score'] }),
     createScore: builder.mutation({
       query: (data) => ({ url: '/scores', method: 'POST', body: data }),
@@ -125,6 +146,10 @@ export const academicApi = apiSlice.injectEndpoints({
       query: ({ id, ...data }) => ({ url: `/scores/${id}`, method: 'PUT', body: data }),
       invalidatesTags: ['Score'],
     }),
+    saveBatchScores: builder.mutation({
+      query: (data) => ({ url: '/scores/batch', method: 'POST', body: data }),
+      invalidatesTags: ['Score'],
+    }),
     deleteScore: builder.mutation({
       query: (id: number) => ({ url: `/scores/${id}`, method: 'DELETE' }),
       invalidatesTags: ['Score'],
@@ -132,6 +157,26 @@ export const academicApi = apiSlice.injectEndpoints({
 
     // ───── DASHBOARD: /api/dashboard/summary ─────
     getDashboardSummary: builder.query({ query: () => '/dashboard/summary', providesTags: [] }),
+
+    // ───── USERS: /api/users ─────
+    getUsers: builder.query({ query: (params?: { page?: number; size?: number; search?: string; role?: string }) => ({ url: '/users', params }), providesTags: ['User'] }),
+    getUsersByRole: builder.query({ query: (role: string) => `/users/role/${role}`, providesTags: ['User'] }),
+    createUser: builder.mutation({
+      query: (data) => ({ url: '/users', method: 'POST', body: data }),
+      invalidatesTags: ['User'],
+    }),
+    updateUser: builder.mutation({
+      query: ({ id, ...data }) => ({ url: `/users/${id}`, method: 'PUT', body: data }),
+      invalidatesTags: ['User'],
+    }),
+    deleteUser: builder.mutation({
+      query: (id: number) => ({ url: `/users/${id}`, method: 'DELETE' }),
+      invalidatesTags: ['User'],
+    }),
+    resetUserPassword: builder.mutation({
+      query: (id: number) => ({ url: `/users/${id}/reset-password`, method: 'POST' }),
+      invalidatesTags: ['User'],
+    }),
 
     // ───── REPORTS: /api/reports ─────
     getStudentTranscriptPdfUrl: builder.query<string, number>({
@@ -188,23 +233,36 @@ export const {
   useUpdateSubjectMutation,
   useDeleteSubjectMutation,
   useGetSchedulesQuery,
+  useGetMyScheduleQuery,
   useCreateScheduleMutation,
   useUpdateScheduleMutation,
   useDeleteScheduleMutation,
   useGetExamsQuery,
+  useGetMyExamsQuery,
   useCreateExamMutation,
   useUpdateExamMutation,
   useDeleteExamMutation,
   useGetAttendancesQuery,
+  useGetClassAttendanceQuery,
   useCreateAttendanceMutation,
   useUpdateAttendanceMutation,
   useDeleteAttendanceMutation,
   useGetScoresQuery,
+  useGetMyScoresQuery,
+  useGetClassScoresQuery,
+  useGetClassScoresForTeacherQuery,
   useGetScoresByStudentQuery,
   useCreateScoreMutation,
   useUpdateScoreMutation,
+  useSaveBatchScoresMutation,
   useDeleteScoreMutation,
   useGetDashboardSummaryQuery,
+  useGetUsersQuery,
+  useGetUsersByRoleQuery,
+  useCreateUserMutation,
+  useUpdateUserMutation,
+  useDeleteUserMutation,
+  useResetUserPasswordMutation,
   useGetStudentTranscriptPdfUrlQuery,
   useGetStudentTranscriptExcelUrlQuery,
   useGetClassGradesExcelUrlQuery,

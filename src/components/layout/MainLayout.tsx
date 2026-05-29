@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Outlet, useNavigate, useLocation } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import { RootState } from '../../store';
@@ -7,7 +7,7 @@ import { toast } from 'sonner';
 import { 
   LayoutDashboard, Users, GraduationCap, BookOpen,
   CalendarDays, CalendarCheck, CheckSquare,
-  LogOut, Menu, UserCircle2, FileText
+  LogOut, Menu, UserCircle2, Settings
 } from 'lucide-react';
 import { Button } from '../ui/button';
 import { cn } from '../../lib/utils';
@@ -20,7 +20,8 @@ interface MenuItem {
 }
 
 const MENU_ITEMS: MenuItem[] = [
-  { key: '/dashboard', label: 'Tổng quan', icon: <LayoutDashboard className="w-5 h-5" />, roles: ['ADMIN', 'TEACHER'] },
+  { key: '/dashboard', label: 'Tổng quan', icon: <LayoutDashboard className="w-5 h-5" />, roles: ['ADMIN'] },
+  { key: '/teachers', label: 'Giảng viên', icon: <Users className="w-5 h-5" />, roles: ['ADMIN'] },
   { key: '/students', label: 'Sinh viên', icon: <Users className="w-5 h-5" />, roles: ['ADMIN', 'TEACHER'] },
   { key: '/classes', label: 'Lớp học', icon: <GraduationCap className="w-5 h-5" />, roles: ['ADMIN'] },
   { key: '/subjects', label: 'Môn học', icon: <BookOpen className="w-5 h-5" />, roles: ['ADMIN'] },
@@ -28,9 +29,9 @@ const MENU_ITEMS: MenuItem[] = [
   { key: '/semesters', label: 'Học kỳ', icon: <CalendarDays className="w-5 h-5" />, roles: ['ADMIN'] },
   { key: '/schedules', label: 'Lịch học', icon: <CalendarDays className="w-5 h-5" />, roles: ['ADMIN', 'TEACHER', 'STUDENT'] },
   { key: '/exams', label: 'Lịch thi', icon: <CalendarCheck className="w-5 h-5" />, roles: ['ADMIN', 'TEACHER', 'STUDENT'] },
-  { key: '/scores', label: 'Điểm số', icon: <CheckSquare className="w-5 h-5" />, roles: ['ADMIN', 'TEACHER', 'STUDENT'] },
-  { key: '/attendances', label: 'Điểm danh', icon: <CheckSquare className="w-5 h-5" />, roles: ['ADMIN', 'TEACHER'] },
-  { key: '/reports', label: 'Báo cáo', icon: <FileText className="w-5 h-5" />, roles: ['ADMIN', 'TEACHER', 'STUDENT'] },
+  { key: '/scores', label: 'Điểm số', icon: <CheckSquare className="w-5 h-5" />, roles: ['TEACHER', 'STUDENT'] },
+  { key: '/attendances', label: 'Điểm danh', icon: <CheckSquare className="w-5 h-5" />, roles: ['TEACHER'] },
+  { key: '/users', label: 'Người dùng', icon: <Settings className="w-5 h-5" />, roles: ['ADMIN'] },
   { key: '/profile', label: 'Hồ sơ', icon: <UserCircle2 className="w-5 h-5" />, roles: ['ADMIN', 'TEACHER', 'STUDENT'] },
 ];
 
@@ -50,6 +51,49 @@ export const MainLayout = () => {
     toast.success('Bạn đã đăng xuất thành công!');
     navigate('/login');
   };
+
+  // Auto-logout when JWT expires: compute expiry from token and schedule logout
+  const logoutTimerRef = useRef<number | null>(null);
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    if (!token) return;
+
+    function getExpiryMsFromToken(t: string): number | null {
+      try {
+        const parts = t.split('.');
+        if (parts.length !== 3) return null;
+        const payload = JSON.parse(atob(parts[1].replace(/-/g, '+').replace(/_/g, '/')));
+        if (!payload.exp) return null;
+        return payload.exp * 1000 - Date.now();
+      } catch (e) {
+        return null;
+      }
+    }
+
+    const ms = getExpiryMsFromToken(token);
+    if (ms !== null) {
+      if (ms <= 0) {
+        handleLogout();
+        return;
+      }
+      // Clear existing timeout
+      if (logoutTimerRef.current) {
+        window.clearTimeout(logoutTimerRef.current);
+      }
+      // Schedule logout a few seconds after expiry to be safe
+      logoutTimerRef.current = window.setTimeout(() => {
+        toast.warning('Phiên đã hết hạn, bạn sẽ được đăng xuất.');
+        handleLogout();
+      }, ms + 2000);
+    }
+
+    return () => {
+      if (logoutTimerRef.current) {
+        window.clearTimeout(logoutTimerRef.current);
+        logoutTimerRef.current = null;
+      }
+    };
+  }, [user?.username]);
 
   return (
     <div className="flex h-screen bg-slate-50 overflow-hidden">

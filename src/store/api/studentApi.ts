@@ -4,15 +4,19 @@ export const studentApi = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
     // GET /api/students?keyword=&page=0&size=10
     getStudents: builder.query({
-      query: (params?: { keyword?: string; page?: number; size?: number }) => ({
+      query: (params?: { keyword?: string; classId?: number; page?: number; size?: number }) => ({
         url: '/students',
-        params: { keyword: params?.keyword || '', page: params?.page ?? 0, size: params?.size ?? 10 },
+        params: { keyword: params?.keyword || '', classId: params?.classId, page: params?.page ?? 0, size: params?.size ?? 10 },
       }),
       providesTags: ['Student'],
     }),
     getStudentById: builder.query({
       query: (id: number) => `/students/${id}`,
       providesTags: (_r, _e, id) => [{ type: 'Student', id }],
+    }),
+    getMyStudent: builder.query({
+      query: () => '/students/me',
+      providesTags: ['Student'],
     }),
     createStudent: builder.mutation({
       query: (data) => ({ url: '/students', method: 'POST', body: data }),
@@ -32,6 +36,7 @@ export const studentApi = apiSlice.injectEndpoints({
 export const {
   useGetStudentsQuery,
   useGetStudentByIdQuery,
+  useGetMyStudentQuery,
   useCreateStudentMutation,
   useUpdateStudentMutation,
   useDeleteStudentMutation,
